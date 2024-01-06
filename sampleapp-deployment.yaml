@@ -16,4 +16,4 @@ spec:
       - name: sample-reactapp-container
         image: actdocker123/cicdpipeline:sample-reactapp-40
         ports:
-        - containerPort: 3000
+        - containerPort: 5000
