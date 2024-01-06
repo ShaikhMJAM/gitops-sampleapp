@@ -10,4 +10,4 @@ spec:
       port : 3000 ###cluster access port
       targetPort: 3000 ###pod/container access port
 
-  type: NortPort
+  type: NodePort
