@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sample-reactapp:sample-reactapp-53
+  name: sample-reactapp-53
 spec:
   replicas: 1  # Number of pods to be created
   selector:
     matchLabels:
-      app: sample-reactapp:sample-reactapp-53
+      app: sample-reactapp-53
   template:
     metadata:
       labels:
-        app: sample-reactapp:sample-reactapp-53
+        app: sample-reactapp-53
     spec:
       containers:
-      - name: sample-reactapp:sample-reactapp-53
-        image: actdocker123/cicdpipeline:sample-reactapp:sample-reactapp-53
+      - name: sample-reactapp-53
+        image: actdocker123/cicdpipeline:sample-reactapp-53
         ports:
         - containerPort: 3000
