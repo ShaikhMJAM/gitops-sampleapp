@@ -1,7 +1,7 @@
 pipeline {
     agent { label "Jenkins-Agent" }
     environment {
-              APP_NAME = "sample-app-pipeline"
+              APP_NAME = "sample-reactapp"
     }
 
     stages {
