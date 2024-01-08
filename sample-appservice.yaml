@@ -6,7 +6,8 @@ spec:
   selector:
     app: sample-reactapp
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3000
-  type: LoadBalancer
+    - nodePort: 30006 ###external access port
+      port : 3000 ###cluster access port
+      targetPort: 3000 ###pod/container access port
+
+  type: NodePort
