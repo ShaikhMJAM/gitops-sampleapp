@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: cbsui-deployment
+    labels:
+        name: cbsui-deployment
+spec:
+   template:
+     metadata:
+       name: cbsui-pd
+       labels:
+         type: cbsui-lb
+     spec:
+        containers:
+        - name: cbsui-ct-v1
+          image: actdocker123/cbs-micro-service:enfinity-cbs-ui-V1.0.20
+          imagePullPolicy: IfNotPresent #Always,Never,IfNotPresent
+#          resources:
+#            limits:
+#               cpu: 1500m
+#               memory: 4Gi
+#            requests:
+#               cpu: 1000m
+#               memory: 2Gi
+#          livenessProbe:
+#             httpGet:
+#                path: /actuator/health/liveness
+#                port: 9103
+#             failureThreshold: 5
+#             periodSeconds: 10
+#             timeoutSeconds: 5
+
+#          startupProbe:
+#             httpGet:
+#                path: /actuator/health
+#                port: 9103
+#             failureThreshold: 5
+#             periodSeconds: 10
+#             initialDelaySeconds: 120
+#             timeoutSeconds: 5
+
+          env:
+#          - name: _JAVA_OPTIONS
+#            value: >-
+#                   -Djavax.net.ssl.trustStore=/opt/sslCertificate/keystore.jks
+#                   -Djavax.net.ssl.trustStorePassword=citybank123
+          - name: POD_IP
+            valueFrom:
+               fieldRef:
+                 fieldPath: status.podIP
+          - name: TZ
+            value: "Asia/Calcutta"
+          envFrom:
+          - configMapRef:
+              name: cbsui-service-ip-config
+
+          volumeMounts: #bind mount with host
+#          - mountPath: /opt/API_LOGS/EnfintyCBS-UI ##mount path from container
+#            name: apilogs
+          - name: ssl-config
+            mountPath: /opt/ssl
+            readOnly: true
+        volumes:
+#        - name: apilogs  ##pass the same name as container mount name
+#          hostPath:
+#            path: /opt/API_LOGS/EnfintyCBS-UI ##path from host machine
+        - name: ssl-config
+          hostPath:
+            path: /opt/ssl
+        imagePullSecrets:
+        - name: cbs-enfinity
+   replicas: 1  ##how many replica will active always
+   selector: ##this will create the service with the nm of deployment name
+      matchLabels: ##set the matching lable for RS
+        type: cbsui-lb
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+   name: cbsui-service #name of service
+   labels:
+     type: cbsui-service-lb     #lable of service
+spec:
+    type: NodePort #service type
+    ports:
+    - nodePort: 30008 ###external access port
+      port : 3000 ###cluster access port
+      targetPort: 3000 ###pod/container access port
+    selector:
+       type: cbsui-lb ##label for selecting pod
