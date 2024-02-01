@@ -1,91 +1,58 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: cbs-enfinity-ui
+  labels:
     name: cbs-enfinity-ui
-    labels:
-        name: cbs-enfinity-ui
 spec:
-   template:
-     metadata:
-       name: cbs-enfinity-ui-pd
-       labels:
-         type: cbs-enfinity-ui-lb
-     spec:
-        containers:
+  template:
+    metadata:
+      name: cbs-enfinity-ui-pd
+      labels:
+        type: cbs-enfinity-ui-lb
+    spec:
+      containers:
         - name: cbs-enfinity-ui-ct-v1
           image: actdocker123/cbs-micro-service:enfinity-cbs-ui-V1.0.20
-          imagePullPolicy: IfNotPresent #Always,Never,IfNotPresent
-#          resources:
-#            limits:
-#               cpu: 1500m
-#               memory: 4Gi
-#            requests:
-#               cpu: 1000m
-#               memory: 2Gi
-#          livenessProbe:
-#             httpGet:
-#                path: /actuator/health/liveness
-#                port: 9103
-#             failureThreshold: 5
-#             periodSeconds: 10
-#             timeoutSeconds: 5
-
-#          startupProbe:
-#             httpGet:
-#                path: /actuator/health
-#                port: 9103
-#             failureThreshold: 5
-#             periodSeconds: 10
-#             initialDelaySeconds: 120
-#             timeoutSeconds: 5
-
+          imagePullPolicy: IfNotPresent
+          # Other configurations (resources, probes, etc.) are commented out for brevity
           env:
-#          - name: _JAVA_OPTIONS
-#            value: >-
-#                   -Djavax.net.ssl.trustStore=/opt/sslCertificate/keystore.jks
-#                   -Djavax.net.ssl.trustStorePassword=citybank123
-          - name: POD_IP
-            valueFrom:
-               fieldRef:
-                 fieldPath: status.podIP
-          - name: TZ
-            value: "Asia/Calcutta"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: TZ
+              value: "Asia/Calcutta"
           envFrom:
-          - configMapRef:
-              name: cbsui-service-ip-config
-
-          volumeMounts: #bind mount with host
-#          - mountPath: /opt/API_LOGS/EnfintyCBS-UI ##mount path from container
-#            name: apilogs
-          - name: ssl-config
-            mountPath: /opt/ssl
-            readOnly: true
-        volumes:
-#        - name: apilogs  ##pass the same name as container mount name
-#          hostPath:
-#            path: /opt/API_LOGS/EnfintyCBS-UI ##path from host machine
+            - configMapRef:
+                name: cbsui-service-ip-config
+          volumeMounts:
+            - name: ssl-config
+              mountPath: /opt/ssl
+              readOnly: true
+      volumes:
         - name: ssl-config
           hostPath:
             path: /opt/ssl
-        imagePullSecrets:
+      imagePullSecrets:
         - name: cbs-enfinity
-   replicas: 1  ##how many replica will active always
-   selector: ##this will create the service with the nm of deployment name
-      matchLabels: ##set the matching lable for RS
-        type: cbs-enfinity-ui-lb
+  replicas: 1
+  selector:
+    matchLabels:
+      type: cbs-enfinity-ui-lb
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-   name: cbs-enfinity-ui-service #name of service
-   labels:
-     type: cbs-enfinity-ui-service-lb     #lable of service
+  name: cbs-enfinity-ui-service
+  labels:
+    type: cbs-enfinity-ui-service-lb
 spec:
-    type: NodePort #service type
-    ports:
-    - nodePort: 30009 ###external access port
-      port : 3000 ###cluster access port
-      targetPort: 3000 ###pod/container access port
-    selector:
-       type: cbs-enfinity-ui-lb ##label for selecting pod
+  type: NodePort
+  ports:
+    - nodePort: 30009
+      port: 3000
+      targetPort: 3000
+  selector:
+    type: cbs-enfinity-ui-lb
