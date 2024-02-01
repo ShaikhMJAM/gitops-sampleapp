@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: cbsui-deployment
+    name: cbs-enfinity-ui
     labels:
-        name: cbsui-deployment
+        name: cbs-enfinity-ui
 spec:
    template:
      metadata:
-       name: cbsui-pd
+       name: cbs-enfinity-ui-pd
        labels:
-         type: cbsui-lb
+         type: cbs-enfinity-ui-lb
      spec:
         containers:
-        - name: cbsui-ct-v1
+        - name: cbs-enfinity-ui-ct-v1
           image: actdocker123/cbs-micro-service:enfinity-cbs-ui-V1.0.20
           imagePullPolicy: IfNotPresent #Always,Never,IfNotPresent
 #          resources:
@@ -78,9 +78,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-   name: cbsui-service #name of service
+   name: cbs-enfinity-ui-service #name of service
    labels:
-     type: cbsui-service-lb     #lable of service
+     type: cbs-enfinity-ui-service-lb     #lable of service
 spec:
     type: NodePort #service type
     ports:
@@ -88,4 +88,4 @@ spec:
       port : 3000 ###cluster access port
       targetPort: 3000 ###pod/container access port
     selector:
-       type: cbsui-lb ##label for selecting pod
+       type: cbs-enfinity-ui-lb ##label for selecting pod
