@@ -72,7 +72,7 @@ spec:
    replicas: 1  ##how many replica will active always
    selector: ##this will create the service with the nm of deployment name
       matchLabels: ##set the matching lable for RS
-        type: cbsui-lb
+        type: cbs-enfinity-ui-lb
 ---
 
 apiVersion: v1
