@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: reactapp-container
-        image: actdocker123/cicdpipeline:react-sample-app
+        image: actdocker123/cicdpipeline:react-app-V1.056
         ports:
         - containerPort: 3000
+
