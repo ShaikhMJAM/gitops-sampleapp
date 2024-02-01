@@ -84,7 +84,7 @@ metadata:
 spec:
     type: NodePort #service type
     ports:
-    - nodePort: 30008 ###external access port
+    - nodePort: 30009 ###external access port
       port : 3000 ###cluster access port
       targetPort: 3000 ###pod/container access port
     selector:
