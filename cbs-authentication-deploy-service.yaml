@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cbs-authentication-microservice-deployment
+  namespace: default
+  labels:
+    app: cbs-authentication-microservice-deployment
+spec:
+  selector:
+    matchLabels:
+      app: cbs-authentication-microservice-selector
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      name: cbs-authentication-microservice-pod
+      labels:
+        app: cbs-authentication-microservice-selector
+    spec:
+      # initContainers:
+      # Init containers are exactly like regular containers, except:
+      # - Init containers always run to completion.
+      # - Each init container must complete successfully before the next one starts.
+      containers:
+      - name: cbs-authentication-microservice-container
+        image: actdocker123/cbs-micro-service:enfinity-authenticationservice-V1.0.11
+        imagePullPolicy: IfNotPresent
+
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - touch /opt/iamnotready ; sleep 120
+
+
+        # resources:
+        #   requests:
+        #     cpu: 2Gi
+        #     memory: 100Mi
+        #   limits:
+        #     cpu: 4Gi
+        #     memory: 100Mi
+
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 8081
+        #   initialDelaySeconds: 5
+        #   timeoutSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 3
+        #   periodSeconds: 10
+
+        # startupProbe:
+        #   httpGet:
+        #   path: /actuator/health
+        #   port: 8081
+        #   failureThreshold: 5
+        #   periodSeconds: 10
+        #   initialDelaySeconds: 180
+        #   timeoutSeconds: 5
+
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "[ ! -f /opt/iamnotready ] || ls -ld /imready &>/dev/null"
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: POD_SERVICE_IP
+          value: "$(CBS_AUTHENTICATION_MICROSERVICE_SERVICE_SERVICE_HOST)"
+        - name: TZ
+          value: "Asia/Calcutta"
+        envFrom:
+        - configMapRef:
+            name: service-ip-config
+
+        volumeMounts: #bind mount with host
+        - mountPath: /opt/API_LOGS/cbs-enfinityAPI-authenticationservice ##mount path from container
+          name: apilogs
+      #          - name: ssl-config
+      #            mountPath: /opt/sslCertificate
+      #            readOnly: true
+      volumes:
+      - name: apilogs ##pass the same name as container mount name
+        hostPath:
+          path: /opt/API_LOGS/cbs-enfinityAPI-authenticationservice ##path from host machine       #changed
+      #        - name: ssl-config
+      #          hostPath:
+      #            path: /opt/sslCertificate
+      imagePullSecrets:
+      - name: cbs-enfinity #changed
+      terminationGracePeriodSeconds: 150
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cbs-authentication-microservice-service
+  namespace: default
+spec:
+  selector:
+    app: cbs-authentication-microservice-selector
+  type: ClusterIP
+  ports:
+  - port: 8081
