@@ -1,0 +1,40 @@
+name: Update Image Tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_tag:
+    runs-on: k8s-manifest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Extract Image Tag
+        id: extract_tag
+        run: |
+          TAG=$(grep 'image:' k8s-manifest/cbs-authentication-deploy-service.yaml | awk -F '[:]' '{print $3}')
+          echo "::set-output name=tag::$TAG"
+
+      - name: Increment Tag
+        id: increment_tag
+        run: |
+          OLD_TAG="${{ steps.extract_tag.outputs.tag }}"
+          PREFIX=$(echo $OLD_TAG | awk -F '-V' '{print $1}')
+          SUFFIX=$(echo $OLD_TAG | awk -F '-V' '{print $2}')
+          MAJOR=$(echo $SUFFIX | cut -d'.' -f1)
+          MINOR=$(echo $SUFFIX | cut -d'.' -f2)
+          NEW_MINOR=$((MINOR + 1))
+          NEW_TAG="$PREFIX-V$MAJOR.$NEW_MINOR"
+          echo "::set-output name=new_tag::$NEW_TAG"
+
+      - name: Store New Tag
+        id: store_tag
+        run: echo "NEW_TAG=${{ steps.increment_tag.outputs.new_tag }}" >> $GITHUB_ENV
+
+      - name: Use New Tag
+        run: |
+          echo "New tag is ${{ steps.increment_tag.outputs.new_tag }}"
