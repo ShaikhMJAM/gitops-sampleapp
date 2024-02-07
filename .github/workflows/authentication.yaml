@@ -22,15 +22,20 @@ jobs:
       - name: Increment Tag
         id: increment_tag
         run: |
-          OLD_TAG="${{ steps.extract_tag.outputs.tag }}"
-          # Parse the version components
-          PREFIX=$(echo $OLD_TAG | awk -F '[-]' '{print $1}')
-          SUFFIX=$(echo $OLD_TAG | awk -F '[-]' '{print $2}')
-          MAJOR=$(echo $SUFFIX | awk -F '[.]' '{print $1}')
-          MINOR=$(echo $SUFFIX | awk -F '[.]' '{print $2}')
-          # Increment the minor version
-          NEW_MINOR=$((MINOR + 1))
-          NEW_TAG="$PREFIX-$MAJOR.$NEW_MINOR"
+          OLD_NAME="enfinity-authenticationservice-V1.0.11"
+
+          # Extracting components from OLD_NAME
+          IFS='-' read -r FIRST_PARA SECOND_PARA VERSION <<< "$OLD_NAME"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+          # Incrementing PATCH
+          NEW_PATCH=$((PATCH + 1))
+
+          # Constructing NEW_TAG
+          NEW_TAG="$FIRST_PARA-$SECOND_PARA-$MAJOR.$MINOR.$NEW_PATCH"
+
+          echo "$NEW_TAG"
+
           echo "::set-output name=new_tag::$NEW_TAG"
 
       - name: Store New Tag
