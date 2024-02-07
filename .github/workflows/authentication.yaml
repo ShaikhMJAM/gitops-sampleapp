@@ -22,7 +22,7 @@ jobs:
       - name: Increment Tag
         id: increment_tag
         run: |
-          TAG="enfinity-authenticationservice-V1.0.11"
+
 
           # Extracting components from TAG
           IFS='-' read -r FIRST_PARA SECOND_PARA VERSION <<< "$TAG"
