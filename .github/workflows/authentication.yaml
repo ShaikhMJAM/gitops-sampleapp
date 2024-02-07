@@ -7,7 +7,7 @@ on:
 
 jobs:
   increment_tag:
-    runs-on: K8s-manifest
+    runs-on: k8s-manifest
 
     steps:
       - name: Checkout Repository
