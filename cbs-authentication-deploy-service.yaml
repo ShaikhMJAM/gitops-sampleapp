@@ -27,7 +27,7 @@ spec:
       # - Each init container must complete successfully before the next one starts.
       containers:
       - name: cbs-authentication-microservice-container
-        image: actdocker123/cbs-micro-service:enfinity-authenticationservice-V1.0.12
+        image: actdocker123/cbs-micro-service:enfinity-authenticationservice-V1.0.13
         imagePullPolicy: IfNotPresent
 
         lifecycle:
