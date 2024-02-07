@@ -22,10 +22,10 @@ jobs:
       - name: Increment Tag
         id: increment_tag
         run: |
-          OLD_NAME="enfinity-authenticationservice-V1.0.11"
+          TAG="enfinity-authenticationservice-V1.0.11"
 
-          # Extracting components from OLD_NAME
-          IFS='-' read -r FIRST_PARA SECOND_PARA VERSION <<< "$OLD_NAME"
+          # Extracting components from TAG
+          IFS='-' read -r FIRST_PARA SECOND_PARA VERSION <<< "$TAG"
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
 
           # Incrementing PATCH
