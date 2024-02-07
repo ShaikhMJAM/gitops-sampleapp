@@ -45,5 +45,6 @@ jobs:
 
       - name: Use New Tag
         run: |
-          echo "New tag is ${{ steps.store_tag.outputs.NEW_TAG }}""
-          echo "New Tag is $GITHUB_ENV "
+          echo "New tag is ${{ steps.store_tag.outputs.NEW_TAG }}"
+
+          echo "New Tag is ${{ GITHUB_ENV }}
