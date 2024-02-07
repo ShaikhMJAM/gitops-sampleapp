@@ -16,7 +16,7 @@ jobs:
       - name: Extract Image Tag
         id: extract_tag
         run: |
-          TAG=$(grep 'image:' k8s-manifest/cbs-authentication-deploy-service.yaml | awk -F '[:]' '{print $3}')
+          TAG=$(grep 'image:' cbs-authentication-deploy-service.yaml | awk -F '[:]' '{print $3}')
           echo "::set-output name=tag::$TAG"
 
       - name: Increment Tag
