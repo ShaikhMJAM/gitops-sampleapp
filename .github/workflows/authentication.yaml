@@ -22,7 +22,7 @@ jobs:
       - name: Increment Tag
         id: increment_tag
         run: |
-          echo "$TAG"
+          echo $TAG
 
 
           # Extracting components from TAG
