@@ -16,19 +16,21 @@ jobs:
       - name: Extract Image Tag
         id: extract_tag
         run: |
-          TAG=$(grep 'image:' cbs-authentication-deploy-service.yaml | awk -F '[:]' '{print $3}')
+          TAG=$(grep 'image:' k8s-manifest/cbs-authentication-deploy-service.yaml | awk -F '[:]' '{print $3}')
           echo "::set-output name=tag::$TAG"
 
       - name: Increment Tag
         id: increment_tag
         run: |
           OLD_TAG="${{ steps.extract_tag.outputs.tag }}"
-          PREFIX=$(echo $OLD_TAG | awk -F '-V' '{print $1}')
-          SUFFIX=$(echo $OLD_TAG | awk -F '-V' '{print $2}')
-          MAJOR=$(echo $SUFFIX | cut -d'.' -f1)
-          MINOR=$(echo $SUFFIX | cut -d'.' -f2)
+          # Parse the version components
+          PREFIX=$(echo $OLD_TAG | awk -F '[-]' '{print $1}')
+          SUFFIX=$(echo $OLD_TAG | awk -F '[-]' '{print $2}')
+          MAJOR=$(echo $SUFFIX | awk -F '[.]' '{print $1}')
+          MINOR=$(echo $SUFFIX | awk -F '[.]' '{print $2}')
+          # Increment the minor version
           NEW_MINOR=$((MINOR + 1))
-          NEW_TAG="$PREFIX-V$MAJOR.$NEW_MINOR"
+          NEW_TAG="$PREFIX-$MAJOR.$NEW_MINOR"
           echo "::set-output name=new_tag::$NEW_TAG"
 
       - name: Store New Tag
